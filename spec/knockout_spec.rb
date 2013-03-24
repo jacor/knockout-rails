@@ -9,6 +9,5 @@ describe KnockoutRails do
   it { should serve 'knockout/sugar-1.1.1' }
 
   it { should serve 'knockout/model' }
-  it { should serve 'knockout/observables' }
-  it { should serve 'knockout/bindings' }
+  it { should serve 'knockout/bindings/all' }
 end

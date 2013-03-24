@@ -2,9 +2,11 @@ class Page extends ko.Model
   @persistAt 'page'
   @upon 'sayHi', (hi) ->
     @sayHi = hi
- 
+
   @beforeSave ->
     @beforeSaved = true
+  @completeSave ->
+    @completeSaved = true
 
 
 describe "Model", ->
@@ -88,7 +90,7 @@ describe "Model", ->
             status: 200
             responseText: "{}"
           expect( @page.isValid() ).toBeTruthy()
-              
+
 
       describe "on 422 resposne (unprocessible entity = validation error)", ->
         it "should set errors for returned fields", ->
@@ -107,3 +109,6 @@ describe "Model", ->
     it "beforeSave should be called ", ->
       @page.save()
       expect(@page.beforeSaved).toBeTruthy()
+    it "completeSave should be called ", ->
+      @page.save()
+      expect(@page.completeSaved).toBeTruthy()

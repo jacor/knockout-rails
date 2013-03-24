@@ -18,7 +18,7 @@ class Module
       @[key] = value
     obj.extended?.apply(@)
     @
-    
+
 Events =
   ClassMethods:
     extended: ->
@@ -86,10 +86,11 @@ Ajax =
             errorData = JSON.parse xhr.responseText
             console?.debug?("Validation error: ", errorData)
             @updateErrors(errorData)
-
       $.ajax(params)
         #.fail (xhr, status, errorThrown)-> console.error "fail: ", this
-        .done (resp, status, xhr)-> @updateErrors {}
+        .done (resp, status, xhr)->
+          @updateErrors {}
+          @trigger 'completeSave', resp, status, xhr
         #.always (xhr, status) -> console.info "always: ", this
 
 
@@ -145,7 +146,7 @@ class Model extends Module
       setter( message ) if field
     @
 
-  
+
 # Export it all:
 ko.Module = Module
 ko.Model = Model
