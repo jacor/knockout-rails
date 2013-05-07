@@ -1,4 +1,4 @@
-#=require jquery
+allowSaving#=require jquery
 #=require knockout/validations
 #=require knockout/validators
 
@@ -40,6 +40,7 @@ Events =
 Callbacks =
   ClassMethods:
     beforeSave: (callback) -> @upon('beforeSave', callback)
+    completeSave: (callback) -> @upon('completeSave', callback)
 
 Ajax =
   ClassMethods:
@@ -92,7 +93,31 @@ Ajax =
           @updateErrors {}
           @trigger 'completeSave', resp, status, xhr
         #.always (xhr, status) -> console.info "always: ", this
-
+    delete: ->
+      allowSaving = @isValid() && @persisted()
+      return false unless allowSaving
+      data = {}
+      data[@constructor.className] =@toJSON()
+      params =
+        type: 'DELETE'
+        dataType: 'json'
+        beforeSend: (xhr)->
+          token = $('meta[name="csrf-token"]').attr('content')
+          xhr.setRequestHeader('X-CSRF-Token', token) if token
+        url: @constructor.getUrl(@)
+        contentType: 'application/json'
+        context: this
+        processData: false # jQuery tries to serialize to much, including constructor data
+        data: JSON.stringify data
+        statusCode:
+          422: (xhr, status, errorThrown)->
+            errorData = JSON.parse xhr.responseText
+            console?.debug?("Validation error: ", errorData)
+            @updateErrors(errorData)
+      $.ajax(params)
+        #.fail (xhr, status, errorThrown)-> console.error "fail: ", this
+        .done (resp, status, xhr)->
+          @updateErrors {}
 
 
 class Model extends Module
